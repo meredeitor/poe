@@ -52,6 +52,14 @@ Todas las rutas de la PWA son relativas, por lo que funcionan tanto en `usuario.
 
 Incluye búsqueda pública, visor paso a paso, panel responsive, catálogos, creación de POE, pasos con imágenes WebP guardadas en Firestore, borradores, revisiones, publicación transaccional, auditoría, QR descargable/imprimible, PDF bajo demanda, caché offline, reglas e índices. La asignación segura de roles debe hacerse desde Firebase Console o desde un backend privilegiado; nunca desde el navegador.
 
+## Editar, eliminar y retirar procedimientos
+
+- **Borrador:** usa `Editar` para modificar información, pasos o fotografías; `Eliminar` borra definitivamente el borrador.
+- **En revisión:** usa `Editar` para continuar trabajando; `Descartar` elimina únicamente la revisión en preparación y conserva la revisión vigente.
+- **Vigente:** crea primero una `Nueva revisión`. La revisión publicada permanece disponible hasta publicar la nueva.
+- **Obsoletar o cancelar:** retira el POE de la consulta pública y del QR, pero conserva todo su historial documental.
+- Los POE publicados nunca se eliminan físicamente desde la interfaz.
+
 ## Permanecer en el plan gratuito
 
 - Mantén el proyecto en Spark y no vincules Cloud Billing.
