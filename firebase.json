@@ -1,0 +1,1 @@
+{"hosting":{"public":".","ignore":["firebase.json","**/.*","**/node_modules/**","scripts/**","README.md","package.json"],"headers":[{"source":"service-worker.js","headers":[{"key":"Cache-Control","value":"no-cache"}]}]},"firestore":{"rules":"firestore.rules","indexes":"firestore.indexes.json"}}

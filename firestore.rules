@@ -1,0 +1,33 @@
+rules_version = '2';
+service cloud.firestore { match /databases/{database}/documents {
+  function signedIn(){ return request.auth != null; }
+  function user(){ return get(/databases/$(database)/documents/users/$(request.auth.uid)); }
+  function roleIs(roles){ return signedIn() && user().data.active == true && user().data.role in roles; }
+  function canEdit(){ return roleIs(['Administrador','Editor']); }
+  function canAdmin(){ return roleIs(['Administrador']); }
+  function published(poeId){ return get(/databases/$(database)/documents/poes/$(poeId)).data.estado == 'Vigente'; }
+  match /poes/{poeId} {
+    allow read: if resource.data.estado == 'Vigente' || roleIs(['Administrador','Editor','Consulta interna']);
+    allow create, update: if canEdit(); allow delete: if canAdmin() && resource.data.estado != 'Vigente';
+    match /revisions/{revisionId} {
+      allow read: if (published(poeId) && resource.data.status == 'Vigente') || roleIs(['Administrador','Editor','Consulta interna']);
+      allow write: if canEdit();
+      match /steps/{stepId} {
+        allow read: if (published(poeId) && get(/databases/$(database)/documents/poes/$(poeId)/revisions/$(revisionId)).data.status == 'Vigente') || roleIs(['Administrador','Editor','Consulta interna']);
+        allow write: if canEdit();
+        match /images/{imageId} {
+          allow read: if (published(poeId) && get(/databases/$(database)/documents/poes/$(poeId)/revisions/$(revisionId)).data.status == 'Vigente') || roleIs(['Administrador','Editor','Consulta interna']);
+          allow create, update: if canEdit()
+            && request.resource.data.mimeType == 'image/webp'
+            && request.resource.data.bytes <= 700000
+            && request.resource.data.dataUrl.size() <= 700000;
+          allow delete: if canEdit();
+        }
+      }
+    }
+  }
+  match /{catalog}/{id} { allow read: if catalog in ['areas','procesos','maquinas','puestos']; allow write: if canEdit() && catalog in ['areas','procesos','maquinas','puestos']; }
+  match /users/{uid} { allow read: if signedIn() && (request.auth.uid == uid || canAdmin()); allow write: if canAdmin(); }
+  match /auditLog/{id} { allow create: if signedIn(); allow read: if canAdmin(); allow update, delete: if false; }
+  match /consultas/{id} { allow create: if request.resource.data.keys().hasOnly(['poeId','createdAt','source']); allow read: if roleIs(['Administrador','Consulta interna']); allow update, delete: if false; }
+}}

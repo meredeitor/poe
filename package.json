@@ -1,0 +1,1 @@
+{"name":"caborca-poe","private":true,"version":"1.0.0","type":"module","scripts":{"start":"npx serve . -l 4173","check":"node scripts/check.mjs"}}
